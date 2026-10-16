@@ -594,6 +594,12 @@ class SafetyTests(unittest.TestCase):
         with self.assertRaises(SystemExit):
             radar.check_not_shrunk(1000, 100, 0.6)  # most issues vanished
 
+    def test_shrink_guard_at_threshold(self):
+        radar.check_not_shrunk(1000, 600, 0.6)  # exactly at the ratio is allowed
+        with self.assertRaises(SystemExit) as stopped:
+            radar.check_not_shrunk(1000, 599, 0.6)  # one below stops the refresh
+        self.assertIn("--force", str(stopped.exception))
+
 
 class QueryTests(unittest.TestCase):
     def test_query_requests_association_without_fetching_more_comments(self):
